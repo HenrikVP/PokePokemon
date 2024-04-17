@@ -1,7 +1,11 @@
 package dk.tec.pokepokemon;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -40,27 +44,62 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
         queue = Volley.newRequestQueue(getApplicationContext());
-        getAllCards();
+        initGui();
     }
 
+
+    void initGui(){
+        findViewById(R.id.btn_api).setOnClickListener(view -> getAllCards());
+        findViewById(R.id.btn_load).setOnClickListener(view -> loadCards());
+    }
     void getAllCards(){
         String url = "https://api.tcgdex.net/v2/en/cards";
         StringRequest request = new StringRequest(
                 Request.Method.GET,
                 url,
                 response -> {
-                    deck = new Gson().fromJson(response,
-                            new TypeToken<List<Pokemoncard>>(){}.getType());
+                    convertToList(response);
                     Toast.makeText(getApplicationContext(),
                             "Amount of cards: " + deck.size(),
                             Toast.LENGTH_LONG).show();
-                    CardAdaptor adaptor = new CardAdaptor(getApplicationContext(), deck);
-                    GridView gridView = findViewById(R.id.gv_deck);
-                    gridView.setAdapter(adaptor);
+                    saveCards(response);
+                    fillAdapter();
                 },
                 volleyError -> {
                     Log.e("Volley", volleyError.getMessage());
                 });
         queue.add(request);
     }
+
+    private void fillAdapter() {
+        CardAdaptor adaptor = new CardAdaptor(getApplicationContext(), deck);
+        GridView gridView = findViewById(R.id.gv_deck);
+        gridView.setAdapter(adaptor);
+    }
+
+    void convertToList(String json){
+        deck = new Gson().fromJson(json,
+                new TypeToken<List<Pokemoncard>>(){}.getType());
+    }
+
+    void saveCards(String data){
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("cards", data);
+        editor.apply();
+    }
+
+    void loadCards(){
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        String data = sharedPref.getString("cards", null);
+        if (data != null){
+            convertToList(data);
+            fillAdapter();
+        }
+        else
+            Toast.makeText(getApplicationContext(),
+                    "No cards loaded",
+                    Toast.LENGTH_LONG).show();
+    }
+
 }
