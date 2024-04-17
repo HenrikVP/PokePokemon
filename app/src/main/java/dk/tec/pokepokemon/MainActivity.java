@@ -2,6 +2,7 @@ package dk.tec.pokepokemon;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.GridView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -20,11 +21,12 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private List<Pokemoncard> deck;
+    private ArrayList<Pokemoncard> deck;
     private RequestQueue queue;
 
     @Override
@@ -52,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),
                             "Amount of cards: " + deck.size(),
                             Toast.LENGTH_LONG).show();
+                    CardAdaptor adaptor = new CardAdaptor(getApplicationContext(), deck);
+                    GridView gridView = findViewById(R.id.gv_deck);
+                    gridView.setAdapter(adaptor);
                 },
                 volleyError -> {
                     Log.e("Volley", volleyError.getMessage());

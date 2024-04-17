@@ -12,12 +12,13 @@ import androidx.annotation.Nullable;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CardAdaptor extends ArrayAdapter<Pokemoncard> {
 
-    public CardAdaptor(@NonNull Context context, int resource, @NonNull List<Pokemoncard> pokemoncards) {
-        super(context, resource, pokemoncards);
+    public CardAdaptor(@NonNull Context context, @NonNull ArrayList<Pokemoncard> pokemoncards) {
+        super(context, 0, pokemoncards);
     }
 
     @NonNull
@@ -25,11 +26,16 @@ public class CardAdaptor extends ArrayAdapter<Pokemoncard> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View item = convertView;
         if (item == null)
-            item = LayoutInflater.from(getContext()).inflate(R.layout.card_view, parent);
+            item = LayoutInflater.from(getContext()).inflate(
+                    R.layout.card_view, parent, false);
 
         Pokemoncard pokemoncard = getItem(position);
-        ImageView image = item.findViewById(R.id.img_cardimage);
-        Picasso.get().load(pokemoncard.getImage()).into(image);
-        return super.getView(position, convertView, parent);
+
+        if (pokemoncard.getImage() != null) {
+            ImageView image = item.findViewById(R.id.img_cardimage);
+            Picasso.get().load(pokemoncard.getImage()+"/low.jpg").into(image);
+        }
+        return item;
+        //return super.getView(position, convertView, parent);
     }
 }
