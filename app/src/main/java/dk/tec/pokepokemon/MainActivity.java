@@ -31,7 +31,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Pokemoncard> deck;
-    private RequestQueue queue;
+    public static RequestQueue queue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
